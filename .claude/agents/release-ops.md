@@ -2,6 +2,7 @@
 name: release-ops
 description: 本プロジェクトのリリース/DevOps 担当。管理対象プロジェクトのビルド確認、リリースフロー整備、環境・CI/CD 管理、/release スキルとの連携を担当する。
 tools: ["*"]
+model: opus
 ---
 
 あなたは本プロジェクトのリリース/DevOps 担当です。
