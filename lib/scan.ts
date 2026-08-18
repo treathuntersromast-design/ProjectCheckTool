@@ -9,7 +9,7 @@ import type { ProjectInfo, ProjectType, ScanResult } from "./types";
  * npm scripts 経由で起動する限り cwd はリポジトリルートを指す。
  * 別の場所を見たい場合のみ PROJECT_ROOT で上書きできる（非常口）。
  */
-function resolveManagedRoot(): string {
+export function resolveManagedRoot(): string {
   return process.env.PROJECT_ROOT ?? path.resolve(process.cwd(), "..");
 }
 
@@ -46,10 +46,12 @@ function detectType(pkg: Record<string, unknown> | null): ProjectType {
   return "node";
 }
 
+/** 本ツール自身の package.json name。isSelf 判定は cwd 非依存でこれを使う。 */
+const SELF_PKG_NAME = "project-check-tool";
+
 async function buildProjectInfo(
   dir: string,
   name: string,
-  selfName: string,
 ): Promise<ProjectInfo | null> {
   const hasGit = await exists(path.join(dir, ".git"));
   const pkg = await readPackageJson(dir);
@@ -73,10 +75,11 @@ async function buildProjectInfo(
     name,
     displayName: (pkg?.name as string | undefined) ?? name,
     type: detectType(pkg),
-    isSelf: name === selfName,
+    isSelf: pkg?.name === SELF_PKG_NAME,
     hasGit,
     hasCi: await exists(path.join(dir, ".github", "workflows")),
     hasTests: scripts.includes("test") || scripts.includes("test:e2e"),
+    hasReadme: await exists(path.join(dir, "README.md")),
     scripts,
     git,
     staleDays,
@@ -85,7 +88,6 @@ async function buildProjectInfo(
 
 export async function scanProjects(): Promise<ScanResult> {
   const managedRoot = resolveManagedRoot();
-  const selfName = path.basename(process.cwd());
   const entries = await fs.readdir(managedRoot, { withFileTypes: true });
 
   const candidates = entries.filter(
@@ -98,7 +100,7 @@ export async function scanProjects(): Promise<ScanResult> {
   const projects = (
     await Promise.all(
       candidates.map((entry) =>
-        buildProjectInfo(path.join(managedRoot, entry.name), entry.name, selfName),
+        buildProjectInfo(path.join(managedRoot, entry.name), entry.name),
       ),
     )
   ).filter((project): project is ProjectInfo => project !== null);

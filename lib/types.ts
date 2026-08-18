@@ -24,6 +24,8 @@ export interface ProjectInfo {
   hasGit: boolean;
   hasCi: boolean;
   hasTests: boolean;
+  /** README.md が存在するか */
+  hasReadme: boolean;
   scripts: string[];
   git: GitInfo | null;
   /** 最終コミットからの経過日数 */
