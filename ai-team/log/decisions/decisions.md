@@ -37,3 +37,39 @@
 - **実施**: GitHub にプライベートリポジトリを作成し、初回リリース（チーム発足＋Phase 1 MVP、3 コミット）を develop → master へマージ・push 済み。
 - **担当**: シャチョー（/release フロー実行）
 - **関連**: `progress.md`
+
+---
+
+## D-004: モデル運用ルール（2026-08-18）
+
+- **決定**（オーナー指示）: **手を動かす作業（実装・修正・ビルド・リリース作業等）は Opus、それ以外の主に考える業務（企画・仕様・設計判断・レビュー・監査）は Fable** を使用する。
+- **適用方法**: シャチョーが subagent 招集時に Agent ツールの model 指定で適用（タスク種別がロール基本値より優先）。ローカルエージェントは frontmatter に既定値を設定済み（security-officer=fable / release-ops=opus）。cre-ai-team プラグイン側の定義は他プロジェクト共用のため変更せず、招集時の model 指定で運用する。
+- **担当**: シャチョー
+- **関連**: `CLAUDE.md`（モデル運用セクション）
+
+---
+
+## D-005: 初版 v1.0.0 のアーキテクチャ確定（2026-08-18）
+
+- **決定**:
+  - 配布形態は **Electron portable exe**（Next.js standalone を utilityProcess で起動、127.0.0.1 バインド）
+  - exe 実行時の管理対象ルートは「exe の実位置（PORTABLE_EXECUTABLE_DIR）から上へ最大 3 階層を探索し、.git を持つサブフォルダを含む最初のディレクトリ」で動的解決。PROJECT_ROOT 環境変数が最優先
+  - アプリデータ（tasks/executions/profiles/releases）は exe 時は userData、npm 起動時はリポジトリの `data/`（gitignore 済み）
+  - アクション実行は「package.json 定義済み scripts のみ・dry-run → 承認 → 実行・E-NNN 監査ログ」。/release の自動起動は次版（v1 は案内まで)
+- **QA 判定**: 高指摘（0.0.0.0 バインド）修正済み・リリース可。中指摘の Origin 検証は次版（127.0.0.1 バインドで当面緩和）
+- **担当**: シャチョー（統括）／engineer・release-ops@Opus（実装）／qa@Fable（検証）
+- **関連**: `progress.md`, `ai-team/log/meetings/2026-08-18-v1-implementation.md`
+
+---
+
+## D-006: リポジトリの public 化と公開前対策（2026-08-18）
+
+- **決定**（オーナー指示）: GitHub リポジトリを **public** で公開する。公開前にセキュリティリスク確認を必須とする。
+- **自己レビューの実施**: コードレビュー 8 観点＋セキュリティ精査を実施。秘密情報（キー・トークン等）は追跡ファイル・git 全履歴ともゼロを確認。
+- **公開前に実施した対策**:
+  - 初期サンプルタスク（seed 元）から他プロジェクトの内部状態への言及を除去し汎化（SEC ブロッカー B-1 対応）
+  - 変更系 API の Origin/Host 検証を middleware で実装（CSRF・DNS リバインディング対策。QA 指摘 M-1 の前倒し）
+  - 実バグ修正: 孤児復旧の競合・並行書き込みの排他・読み取り失敗時のデータ喪失経路・exe での自己判定
+- **許容した露出**（オーナー報告事項）: ai-team ログ・決定台帳に管理対象プロジェクトの名称と一般的な運用課題が記載されている（秘密の実体値はなし）。コミット author のメールアドレスは公開される（GitHub アカウント名から推測可能な範囲）。
+- **担当**: シャチョー（統括）／security-officer・レビュー各担当@Fable／engineer@Opus（修正）
+- **関連**: `middleware.ts`, `lib/mock/tasks.ts`, `progress.md`
