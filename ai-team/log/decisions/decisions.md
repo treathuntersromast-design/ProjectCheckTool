@@ -28,3 +28,12 @@
 - **MVP スコープ（Phase 1）**: F1 プロジェクト自動検出＋F2 git 状態ダッシュボード（read-only）
 - **担当**: シャチョー（実装統括）
 - **関連**: `ai-team/log/meetings/2026-08-18-team-kickoff.md`, `progress.md`
+
+---
+
+## D-003: ブランチ運用と初回リリース（2026-08-18）
+
+- **決定**（オーナー指示）: **master＝本番用、develop＝開発用**。日常の作業は develop で行い、リリース時に master へマージする。GitHub の既定ブランチは master。
+- **実施**: GitHub にプライベートリポジトリを作成し、初回リリース（チーム発足＋Phase 1 MVP、3 コミット）を develop → master へマージ・push 済み。
+- **担当**: シャチョー（/release フロー実行）
+- **関連**: `progress.md`
