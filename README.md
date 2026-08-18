@@ -12,6 +12,17 @@ npm run dev
 
 本番ビルドで動かす場合は `npm run build` → `npm run start`。
 
+### Windows 単体 exe（Electron portable）
+
+配布用の単体実行ファイルを生成する場合:
+
+```bash
+npm run dist
+# → dist/ProjectCheckTool-<version>-portable.exe
+```
+
+生成した portable exe は Node 環境不要で起動でき、内部で Next.js standalone サーバー（127.0.0.1、外部非公開）を立ち上げてウィンドウ表示する。管理対象ルートは exe の位置から親フォルダを動的解決するため、exe をリポジトリの `dist/` に置いたまま起動すれば従来どおり親フォルダ配下のプロジェクトを俯瞰できる（`PROJECT_ROOT` を設定すればその値を優先）。データは `%APPDATA%/ProjectCheckTool/data` に保存される。
+
 ## 設計原則
 
 - **ポータビリティ**: 管理対象ルートは「本リポジトリの親フォルダ（`..`）」を実行時に動的解決する。コード・設定に絶対パスを書かない。どの PC でもフォルダ構成が同じなら同じように動く。別の場所を管理したい場合のみ環境変数 `PROJECT_ROOT` で上書き可能（非常口）。

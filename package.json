@@ -1,11 +1,16 @@
 {
   "name": "project-check-tool",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
+  "description": "親フォルダ配下のプロジェクトを俯瞰・管理するローカル Web アプリ（Electron portable exe 版）",
+  "author": "Creancora",
+  "main": "electron/main.js",
   "scripts": {
-    "dev": "next dev -p 3777",
+    "dev": "next dev -p 3777 -H 127.0.0.1",
     "build": "next build",
-    "start": "next start -p 3777"
+    "start": "next start -p 3777 -H 127.0.0.1",
+    "dist": "next build && electron-builder --win portable",
+    "smoke": "node -e \"console.log('ProjectCheckTool smoke ok')\""
   },
   "dependencies": {
     "next": "^15.3.0",
@@ -17,8 +22,31 @@
     "@types/node": "^24.0.0",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
+    "electron": "^33.0.0",
+    "electron-builder": "^25.1.8",
     "postcss": "^8.5.0",
     "tailwindcss": "^4.1.0",
     "typescript": "^5.8.0"
+  },
+  "build": {
+    "appId": "com.creancora.projectchecktool",
+    "productName": "ProjectCheckTool",
+    "files": [
+      "electron/**"
+    ],
+    "extraResources": [
+      {
+        "from": ".next/standalone",
+        "to": "standalone"
+      },
+      {
+        "from": ".next/static",
+        "to": "standalone/.next/static"
+      }
+    ],
+    "win": {
+      "target": "portable",
+      "artifactName": "ProjectCheckTool-${version}-portable.exe"
+    }
   }
 }
